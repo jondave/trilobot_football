@@ -20,7 +20,7 @@ class TrilobotController:
         
         # Calculate speed adjustments based on the offset
         self.speed_factor = 0.005  # You can adjust this factor for more sensitivity
-        self.max_speed = 1.0  # Set the max speed of the follow ball function
+        self.max_speed = 0.5  # Set the max speed of the follow ball function
         ####### follow ball function
 
         ################# tunable variables
@@ -29,14 +29,25 @@ class TrilobotController:
         self.tbot = Trilobot()
 
         self.enable_colour_detect = False # starting flag 
-        self.enable_follow_ball = False # starting flag 
-        self.enable_draw_all_contours = False # starting flag 
+        self.enable_colour_detect_goal = False # starting flag
+        self.enable_follow_ball = False # starting flag
+        self.enable_follow_goal = False # starting flag
+
+        # Ball detection colour ranges
         self.hue_min = 0 # starting hue min 
         self.hue_max = 179 # starting hue  max
         self.saturation_min = 0 # starting saturation min
         self.saturation_max = 255 # starting saturation max
         self.intensity_min = 0 # starting intensity min
         self.intensity_max = 255 # starting intensity max
+
+        # Goal detection colour ranges
+        self.hue_min_goal = 0 # starting hue min 
+        self.hue_max_goal = 179 # starting hue  max
+        self.saturation_min_goal = 0 # starting saturation min
+        self.saturation_max_goal = 255 # starting saturation max
+        self.intensity_min_goal = 0 # starting intensity min
+        self.intensity_max_goal = 255 # starting intensity max
 
         self.picam2 = Picamera2()
         self.picam2.configure(self.picam2.create_preview_configuration(main={"format": 'BGR888', "size": (640, 480)}))
@@ -93,15 +104,24 @@ class TrilobotController:
 
                 elif cmd[0] == "stop":
                     self.tbot.stop()
+                    self.enable_follow_ball = False
+                    self.enable_follow_goal = False
 
                 elif cmd[0] == "opencv":
                     self.enable_colour_detect = not self.enable_colour_detect
-                    self.enable_draw_all_contours = True                    
 
                 elif cmd[0] == "follow_ball":
                     self.enable_colour_detect = not self.enable_colour_detect
                     self.enable_follow_ball = not self.enable_follow_ball
-                    self.enable_draw_all_contours = False
+                    self.enable_follow_goal = False
+
+                elif cmd[0] == "opencv_goal":
+                    self.enable_colour_detect_goal = not self.enable_colour_detect_goal
+
+                elif cmd[0] == "follow_goal":
+                    self.enable_colour_detect_goal = not self.enable_colour_detect_goal
+                    self.enable_follow_goal = not self.enable_follow_goal
+                    self.enable_follow_ball = False
 
                 elif cmd[0] == "speed":
                     self.speed = float(cmd[1])
@@ -124,6 +144,27 @@ class TrilobotController:
                 elif cmd[0] == "intensity_max":
                     self.intensity_max = int(cmd[1])
 
+                elif cmd[0] == "speed":
+                    self.speed = float(cmd[1])
+
+                elif cmd[0] == "hue_min_goal":
+                    self.hue_min_goal = int(cmd[1])
+
+                elif cmd[0] == "hue_max_goal":
+                    self.hue_max_goal = int(cmd[1])
+
+                elif cmd[0] == "saturation_min_goal":
+                    self.saturation_min_goal = int(cmd[1])
+
+                elif cmd[0] == "saturation_max_goal":
+                    self.saturation_max_goal = int(cmd[1])
+
+                elif cmd[0] == "intensity_min_goal":
+                    self.intensity_min_goal = int(cmd[1])
+
+                elif cmd[0] == "intensity_max_goal":
+                    self.intensity_max_goal = int(cmd[1])
+
                 else: 
                     print("send either `up` `down` `left` `right` or `stop` to move your robot!")
 
@@ -136,11 +177,7 @@ class TrilobotController:
         def colour_detect(self, _img):
             hsv_img = cv2.cvtColor(_img, cv2.COLOR_BGR2HSV) # convert to hsv image
 
-            # Create a binary (mask) image, HSV = hue (colour) (0-179), saturation  (0-255), value (brightness) (0-255)
-            #hsv_thresh = cv2.inRange(hsv_img,
-            #                            np.array((50, 0, 0)), # lower range
-            #                            np.array((80, 255, 255))) # upper range
-
+            # Draw and fill all the contours of the ball detection
             hsv_thresh = cv2.inRange(hsv_img,
                                         np.array((self.hue_min, self.saturation_min, self.intensity_min)), # lower range
                                         np.array((self.hue_max, self.saturation_max, self.intensity_max))) # upper range
@@ -157,27 +194,67 @@ class TrilobotController:
                 return _img, None
                 
             # Find the largest contour using max() and cv2.contourArea as the key
-            largest_contour = max(hsv_contours, key=cv2.contourArea)
+            largest_contour = max(hsv_contours, key=cv2.contourArea)                
+        
+            # Create an overlay to draw the contours on
+            overlay = _img.copy()
+
+            # Iterate through the contours
+            for c in hsv_contours:
+                # Calculate the area of the contour
+                a = cv2.contourArea(c)
+                # If the area is big enough, fill the contour on the overlay
+                if a > 100.0:
+                    cv2.drawContours(overlay, [c], -1, (0, 255, 0), cv2.FILLED)  # Draw filled contour on overlay
+                    cv2.drawContours(_img, [c], -1, (255, 255, 255), 2)  # Draw outline of contours
+
+            # Set the desired opacity (0.0 to 1.0)
+            opacity = 0.5
+
+            # Blend the overlay with the original image
+            _img = cv2.addWeighted(overlay, opacity, _img, 1 - opacity, 0)
+
+            return _img, largest_contour
+
+        def colour_detect_goal(self, _img):
+            hsv_img = cv2.cvtColor(_img, cv2.COLOR_BGR2HSV) # convert to hsv image            
                 
-            # Draw and fill all the contours with opacity
-            if self.enable_draw_all_contours:
-                # Create an overlay to draw the contours on
-                overlay = _img.copy()
+            # Draw and fill all the contours of the goal detection
+            hsv_thresh = cv2.inRange(hsv_img,
+                                        np.array((self.hue_min_goal, self.saturation_min_goal, self.intensity_min_goal)), # lower range
+                                        np.array((self.hue_max_goal, self.saturation_max_goal, self.intensity_max_goal))) # upper range
 
-                # Iterate through the contours
-                for c in hsv_contours:
-                    # Calculate the area of the contour
-                    a = cv2.contourArea(c)
-                    # If the area is big enough, fill the contour on the overlay
-                    if a > 100.0:
-                        cv2.drawContours(overlay, [c], -1, (0, 255, 0), cv2.FILLED)  # Draw filled contour on overlay
-                        cv2.drawContours(_img, [c], -1, (255, 0, 0), 2)  # Draw outline of contours
+            # Find the contours in the mask generated from the HSV image
+            hsv_contours, hierachy = cv2.findContours(
+                hsv_thresh.copy(),
+                cv2.RETR_TREE,
+                cv2.CHAIN_APPROX_SIMPLE)
 
-                # Set the desired opacity (0.0 to 1.0)
-                opacity = 0.5
+            # Check if any contours are found
+            if not hsv_contours:
+                # If no contours are found, return the original image and None for the largest contour
+                return _img, None
+                
+            # Find the largest contour using max() and cv2.contourArea as the key
+            largest_contour = max(hsv_contours, key=cv2.contourArea)   
 
-                # Blend the overlay with the original image
-                _img = cv2.addWeighted(overlay, opacity, _img, 1 - opacity, 0)
+            # Create an overlay to draw the contours on
+            overlay = _img.copy()
+
+            # Iterate through the contours
+            for c in hsv_contours:
+                # Calculate the area of the contour
+                a = cv2.contourArea(c)
+                # If the area is big enough, fill the contour on the overlay
+                if a > 100.0:
+                    cv2.drawContours(overlay, [c], -1, (255, 0, 0), cv2.FILLED)  # Draw filled contour on overlay
+                    cv2.drawContours(_img, [c], -1, (255, 255, 255), 2)  # Draw outline of contours
+
+            # Set the desired opacity (0.0 to 1.0)
+            opacity = 0.5
+
+            # Blend the overlay with the original image
+            _img = cv2.addWeighted(overlay, opacity, _img, 1 - opacity, 0)
 
             return _img, largest_contour
 
@@ -219,7 +296,49 @@ class TrilobotController:
 
             # Optionally, draw the bounding box and the middle point
             cv2.rectangle(_img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            cv2.circle(_img, (bounding_box_center, y + h // 2), 5, (0, 0, 255), -1)
+            cv2.circle(_img, (bounding_box_center, y + h // 2), 5, (0, 255, 0), -1)
+
+            return _img
+
+        def follow_goal(self, _img, largest_contour):
+            # Get the bounding box around the largest contour
+            x, y, w, h = cv2.boundingRect(largest_contour)
+
+            # Calculate the horizontal middle (center) of the bounding box
+            bounding_box_center = x + w // 2
+
+            # Get the center of the image
+            image_center = _img.shape[1] // 2  # Width of the image
+
+            # Calculate the offset between the contour's center and the image center
+            offset = bounding_box_center - image_center
+
+            # Proportional control: If the offset is larger than the threshold, adjust the robot's speed
+            if abs(offset) > self.threshold:
+                if bounding_box_center > image_center:
+                    # If the contour is to the right of the center, turn right
+                    left_speed = self.speed + (abs(offset) * self.speed_factor)
+                    right_speed = self.speed - (abs(offset) * self.speed_factor)
+                else:
+                    # If the contour is to the left of the center, turn left
+                    left_speed = self.speed - (abs(offset) * self.speed_factor)
+                    right_speed = self.speed + (abs(offset) * self.speed_factor)
+                
+                # Clamp the speeds to be within the range [0, max_speed]
+                left_speed = max(0, min(self.max_speed, left_speed))
+                right_speed = max(0, min(self.max_speed, right_speed))
+                
+                # Set the motor speeds to move the robot
+                self.tbot.set_motor_speeds(round(left_speed, 1), round(right_speed, 1))
+                print("left_speed:", left_speed, "right_speed:", right_speed, end="\r")
+            else:
+                # If the contour is close to the center, move forward
+                self.tbot.set_motor_speeds(self.speed, self.speed)
+                print("forward speed: ", self.speed)
+
+            # Optionally, draw the bounding box and the middle point
+            cv2.rectangle(_img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            cv2.circle(_img, (bounding_box_center, y + h // 2), 5, (255, 0, 0), -1)
 
             return _img
 
@@ -231,8 +350,14 @@ class TrilobotController:
                 if self.enable_colour_detect:
                     img, largest_contour = colour_detect(self, img)
 
+                if self.enable_colour_detect_goal:
+                    img, largest_contour_goal = colour_detect_goal(self, img)
+
                 if self.enable_follow_ball and largest_contour is not None:
-                    img = follow_ball(self, img, largest_contour)
+                    img = follow_ball(self, img, largest_contour)                
+
+                if self.enable_follow_goal and largest_contour_goal is not None:
+                    img = follow_goal(self, img, largest_contour_goal)
 
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                 ret, jpeg = cv2.imencode('.jpg', img)

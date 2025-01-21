@@ -51,7 +51,17 @@ document.getElementById('follow_ball').onclick = ev => {
     sendCmd("follow_ball");
 };
 
-// Slider Controls
+document.getElementById('opencv_goal').onclick = ev => {
+    ev.preventDefault();
+    sendCmd("opencv_goal");
+};
+
+document.getElementById('follow_goal').onclick = ev => {
+    ev.preventDefault();
+    sendCmd("follow_goal");
+};follow_goal
+
+// Speed slider Controls
 const speedSlider = document.getElementById('speedSlider');
 const speedLabel = document.getElementById('speedLabel');  // Assuming a label to show the speed value
 
@@ -62,7 +72,7 @@ speedSlider.addEventListener('input', () => {
     sendCmd(`speed:${speedSlider.value}`);
 });
 
-// Color Range Sliders
+// Color Range Sliders Ball
 const hueMinInput = document.getElementById('hueMin');
 const hueMaxInput = document.getElementById('hueMax');
 const saturationMinInput = document.getElementById('saturationMin');
@@ -70,7 +80,7 @@ const saturationMaxInput = document.getElementById('saturationMax');
 const intensityMinInput = document.getElementById('intensityMin');
 const intensityMaxInput = document.getElementById('intensityMax');
 
-// Display values for sliders
+// Display values for sliders Ball
 const hueMinValue = document.getElementById('hueMinValue');
 const hueMaxValue = document.getElementById('hueMaxValue');
 const saturationMinValue = document.getElementById('saturationMinValue');
@@ -78,7 +88,7 @@ const saturationMaxValue = document.getElementById('saturationMaxValue');
 const intensityMinValue = document.getElementById('intensityMinValue');
 const intensityMaxValue = document.getElementById('intensityMaxValue');
 
-// Update display values for sliders
+// Update display values for sliders Ball
 function updateValues() {
     hueMinValue.textContent = hueMinInput.value;
     hueMaxValue.textContent = hueMaxInput.value;
@@ -88,7 +98,7 @@ function updateValues() {
     intensityMaxValue.textContent = intensityMaxInput.value;
 }
 
-// Event listeners for sliders
+// Event listeners for sliders Ball
 hueMinInput.addEventListener('input', () => {
     const newHueMin = parseFloat(hueMinInput.value);
     const newHueMax = parseFloat(hueMaxInput.value);
@@ -163,6 +173,110 @@ intensityMaxInput.addEventListener('input', () => {
 
 // Update values on page load
 updateValues();
+// Color Range Sliders Ball End
+
+// Color Range Sliders Goal
+const hueMinInputGoal = document.getElementById('hueMinGoal');
+const hueMaxInputGoal = document.getElementById('hueMaxGoal');
+const saturationMinInputGoal = document.getElementById('saturationMinGoal');
+const saturationMaxInputGoal = document.getElementById('saturationMaxGoal');
+const intensityMinInputGoal = document.getElementById('intensityMinGoal');
+const intensityMaxInputGoal = document.getElementById('intensityMaxGoal');
+
+// Display values for sliders Goal
+const hueMinValueGoal = document.getElementById('hueMinValueGoal');
+const hueMaxValueGoal = document.getElementById('hueMaxValueGoal');
+const saturationMinValueGoal = document.getElementById('saturationMinValueGoal');
+const saturationMaxValueGoal = document.getElementById('saturationMaxValueGoal');
+const intensityMinValueGoal = document.getElementById('intensityMinValueGoal');
+const intensityMaxValueGoal = document.getElementById('intensityMaxValueGoal');
+
+// Update display values for sliders Goal
+function updateValuesGoal() {
+    hueMinValueGoal.textContent = hueMinInputGoal.value;
+    hueMaxValueGoal.textContent = hueMaxInputGoal.value;
+    saturationMinValueGoal.textContent = saturationMinInputGoal.value;
+    saturationMaxValueGoal.textContent = saturationMaxInputGoal.value;
+    intensityMinValueGoal.textContent = intensityMinInputGoal.value;
+    intensityMaxValueGoal.textContent = intensityMaxInputGoal.value;
+}
+
+// Event listeners for sliders Goal
+hueMinInputGoal.addEventListener('input', () => {
+    const newHueMinGoal = parseFloat(hueMinInputGoal.value);
+    const newHueMaxGoal = parseFloat(hueMaxInputGoal.value);
+    
+    if (!isNaN(newHueMinGoal) && newHueMinGoal <= newHueMaxGoal) {
+        sendCmd(`hue_min_goal:${newHueMinGoal}`);
+        updateValuesGoal();
+    } else {
+        hueMinInputGoal.value = newHueMaxGoal;  // Reset to max value if min exceeds max
+    }
+});
+
+hueMaxInputGoal.addEventListener('input', () => {
+    const newHueMaxGoal = parseFloat(hueMaxInputGoal.value);
+    const newHueMinGoal = parseFloat(hueMinInputGoal.value);
+    
+    if (!isNaN(newHueMaxGoal) && newHueMaxGoal >= newHueMinGoal) {
+        sendCmd(`hue_max_goal:${newHueMaxGoal}`);
+        updateValuesGoal();
+    } else {
+        hueMaxInputGoal.value = newHueMinGoal;  // Reset to min value if max is less than min
+    }
+});
+
+saturationMinInputGoal.addEventListener('input', () => {
+    const newSaturationMinGoal = parseFloat(saturationMinInputGoal.value);
+    const newSaturationMaxGoal = parseFloat(saturationMaxInputGoal.value);
+    
+    if (!isNaN(newSaturationMinGoal) && newSaturationMinGoal <= newSaturationMaxGoal) {
+        sendCmd(`saturation_min_goal:${newSaturationMinGoal}`);
+        updateValuesGoal();
+    } else {
+        saturationMinInputGoal.value = newSaturationMaxGoal;  // Reset to max value if min exceeds max
+    }
+});
+
+saturationMaxInputGoal.addEventListener('input', () => {
+    const newSaturationMaxGoal = parseFloat(saturationMaxInputGoal.value);
+    const newSaturationMinGoal = parseFloat(saturationMinInputGoal.value);
+    
+    if (!isNaN(newSaturationMaxGoal) && newSaturationMaxGoal >= newSaturationMinGoal) {
+        sendCmd(`saturation_max_goal:${newSaturationMaxGoal}`);
+        updateValuesGoal();
+    } else {
+        saturationMaxInputGoal.value = newSaturationMinGoal;  // Reset to min value if max is less than min
+    }
+});
+
+intensityMinInputGoal.addEventListener('input', () => {
+    const newIntensityMinGoal = parseFloat(intensityMinInputGoal.value);
+    const newIntensityMaxGoal = parseFloat(intensityMaxInputGoal.value);
+    
+    if (!isNaN(newIntensityMinGoal) && newIntensityMinGoal <= newIntensityMaxGoal) {
+        sendCmd(`intensity_min_goal:${newIntensityMinGoal}`);
+        updateValuesGoal();
+    } else {
+        intensityMinInputGoal.value = newIntensityMaxGoal;  // Reset to max value if min exceeds max
+    }
+});
+
+intensityMaxInputGoal.addEventListener('input', () => {
+    const newIntensityMaxGoal = parseFloat(intensityMaxInputGoal.value);
+    const newIntensityMinGoal = parseFloat(intensityMinInputGoal.value);
+    
+    if (!isNaN(newIntensityMaxGoal) && newIntensityMaxGoal >= newIntensityMinGoal) {
+        sendCmd(`intensity_max_goal:${newIntensityMaxGoal}`);
+        updateValuesGoal();
+    } else {
+        intensityMaxInputGoal.value = newIntensityMinGoal;  // Reset to min value if max is less than min
+    }
+});
+
+// Update values on page load
+updateValues();
+// Color Range Sliders Goal End
 
 // WASD Controls
 document.addEventListener('keydown', function (event) {
