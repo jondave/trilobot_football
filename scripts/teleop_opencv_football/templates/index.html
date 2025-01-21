@@ -21,7 +21,7 @@
       
       <!-- Icons from https://icon-sets.iconify.design/mdi/ -->  
       <div class="controls">
-        <div id="fwd-back">
+        <div id="button-flex">
           <button class="btn" id="up">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path
@@ -36,7 +36,7 @@
             </svg>
           </button>
         </div>
-        <div id="left-right">
+        <div id="button-flex">
           <button class="btn" id="left">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path
@@ -54,69 +54,116 @@
             </svg>
           </button>
         </div>
-        <div id="stop-camera">
+        <div id="button-flex">
           <button class="btn" id="stop">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path fill="currentColor" d="M18 18H6V6h12z" />
             </svg>
           </button>
 
+          <button class="btn" id="ultrasonic">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path fill="#fff" d="M16.79 23c-.42-.17-.72-.55-.79-1c-.05-.26 0-.44.4-1.16c1.5-2.7 2.27-5.75 2.23-8.84c.04-3-.69-5.93-2.13-8.56c-.21-.44-.4-.86-.56-1.31c.06-.38.25-.73.56-.94c.45-.24 1-.19 1.41.09c.28.36.52.72.72 1.14A21.4 21.4 0 0 1 20.8 9c.23 1.81.26 3.65.09 5.47c-.31 2.34-1 4.6-2.06 6.71c-.64 1.28-1 1.82-1.38 1.82zm-4.36-2.21c-.57-.16-.93-.74-.81-1.32c0-.12.31-.67.59-1.23c1.18-2.27 1.69-4.83 1.46-7.38c-.14-1.83-.67-3.61-1.54-5.22c-.63-1.26-.67-1.46-.3-2c.44-.49 1.17-.56 1.71-.14c.72 1.06 1.29 2.22 1.71 3.44c1.28 3.79 1.08 7.92-.56 11.56c-.84 1.89-1.43 2.5-2.26 2.24zm-4.5-2.23a1.31 1.31 0 0 1-.73-.86c0-.2 0-.46.45-1.26a8.99 8.99 0 0 0 0-8.68C7 6.5 7 6.24 7.53 5.76c.19-.22.47-.33.77-.29c.64 0 1 .31 1.54 1.44A10.5 10.5 0 0 1 11.12 12c.04 1.81-.4 3.61-1.27 5.2c-.54 1.05-.81 1.3-1.35 1.39c-.19.02-.39 0-.57-.09zm-4.21-2.13c-.33-.16-.59-.43-.72-.78c-.1-.35 0-.65.4-1.29c.5-.68.74-1.52.69-2.36c.07-.85-.16-1.69-.65-2.39A6 6 0 0 1 3 8.82c-.11-.63.31-1.23 1-1.35c.54-.1.92.13 1.42.89a6.62 6.62 0 0 1 0 7.27c-.51.77-1.09 1-1.69.8z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="button-flex">
+          <button class="btn" id="follow_ball">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path fill="white" d="M19.04 4.85C17.34 3.2 15.33 2.25 13 2v3.62l9 5.18c-.28-2.3-1.27-4.3-2.96-5.95M12 22c3.44 0 6.16-1.38 8.17-4.14L17.06 16l-8.99 5.2c1.25.53 2.57.8 3.93.8m1-10.59l8.15 4.66c.44-.94.73-1.93.85-2.96l-9-5.18zm-9.12 6.4c.66.91 1.38 1.65 2.17 2.19l8.99-5.1L12 13.15zM11.04 2C10 2.09 9 2.36 8 2.8v10.35l3.04-1.74zM2 12c0 1.39.3 2.77.89 4.12L6 14.28V4c-2.67 2-4 4.65-4 8"/>
+            </svg>
+          </button>
+          
           <button class="btn" id="opencv">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path fill="currentColor" d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2m8 3a5 5 0 0 0-5 5a5 5 0 0 0 5 5a5 5 0 0 0 5-5a5 5 0 0 0-5-5m0 2a3 3 0 0 1 3 3a3 3 0 0 1-3 3a3 3 0 0 1-3-3a3 3 0 0 1 3-3" />
             </svg>
           </button>
         </div>
-        <div id="ball">
-          <button class="btn" id="follow_ball">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <path fill="white" d="M19.04 4.85C17.34 3.2 15.33 2.25 13 2v3.62l9 5.18c-.28-2.3-1.27-4.3-2.96-5.95M12 22c3.44 0 6.16-1.38 8.17-4.14L17.06 16l-8.99 5.2c1.25.53 2.57.8 3.93.8m1-10.59l8.15 4.66c.44-.94.73-1.93.85-2.96l-9-5.18zm-9.12 6.4c.66.91 1.38 1.65 2.17 2.19l8.99-5.1L12 13.15zM11.04 2C10 2.09 9 2.36 8 2.8v10.35l3.04-1.74zM2 12c0 1.39.3 2.77.89 4.12L6 14.28V4c-2.67 2-4 4.65-4 8"/>
-            </svg>
-          </button>
-        </div>
 
         <h1 id="hostname">{{ hostname }}</h1>
+        <h2 id="ultrasonic_distance">Distance: No Data</h2>
       </div>
 
       <button id="stop-mobile">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M3 3v18h18V3"/></svg>
       </button>
 
-      <div id="controls">        
-        <div class="slider-container">
-          <label for="speedSlider">Speed</label>
-          <input type="range" id="speedSlider" min="0" max="1" step="0.01" value="0.5">
-          <span id="speedLabel">Speed (0-1): 0.5</span> <!-- Displays speed value -->
-        </div>        
-          
-        <div class="slider-container">
-          <label for="hueMin">Hue Min</label>
-          <input type="range" id="hueMin" min="0" max="179" value="0">
-          <span id="hueMinValue">0</span> <!-- Displays hue min value -->
-
-          <label for="hueMax">Hue Max</label>
-          <input type="range" id="hueMax" min="0" max="179" value="179">
-          <span id="hueMaxValue">179</span> <!-- Displays hue max value -->
+      <div id="controls">
+        <div class="speed-slider">
+          <div class="slider-container">
+            <label for="speedSlider">Speed</label>
+            <input type="range" id="speedSlider" min="0" max="1" step="0.01" value="0.5">
+            <span id="speedLabel">Speed (0-1): 0.5</span> <!-- Displays speed value -->
+          </div>
         </div>
+
+        <div class="ball-colour-sliders">
+          <label>Ball Colour Ranges:</label>
+
+          <div class="slider-container">
+            <label for="hueMin">Hue Min</label>
+            <input type="range" id="hueMin" min="0" max="179" value="0">
+            <span id="hueMinValue">0</span> <!-- Displays hue min value -->
+
+            <label for="hueMax">Hue Max</label>
+            <input type="range" id="hueMax" min="0" max="179" value="179">
+            <span id="hueMaxValue">179</span> <!-- Displays hue max value -->
+          </div>
+            
+          <div class="slider-container">
+            <label for="saturationMin">Saturation Min</label>
+            <input type="range" id="saturationMin" min="0" max="255" value="0">
+            <span id="saturationMinValue">0</span> <!-- Displays saturation min value -->
+
+            <label for="saturationMax">Saturation Max</label>
+            <input type="range" id="saturationMax" min="0" max="255" value="255">
+            <span id="saturationMaxValue">255</span> <!-- Displays saturation max value -->
+          </div>
           
-        <div class="slider-container">
-          <label for="saturationMin">Saturation Min</label>
-          <input type="range" id="saturationMin" min="0" max="255" value="0">
-          <span id="saturationMinValue">0</span> <!-- Displays saturation min value -->
+          <div class="slider-container">
+            <label for="intensityMin">Intensity Min</label>
+            <input type="range" id="intensityMin" min="0" max="255" value="0">
+            <span id="intensityMinValue">0</span> <!-- Displays intensity min value -->
 
-          <label for="saturationMax">Saturation Max</label>
-          <input type="range" id="saturationMax" min="0" max="255" value="255">
-          <span id="saturationMaxValue">255</span> <!-- Displays saturation max value -->
+            <label for="intensityMax">Intensity Max</label>
+            <input type="range" id="intensityMax" min="0" max="255" value="255">
+            <span id="intensityMaxValue">255</span> <!-- Displays intensity max value -->
+          </div>
         </div>
-        
-        <div class="slider-container">
-          <label for="intensityMin">Intensity Min</label>
-          <input type="range" id="intensityMin" min="0" max="255" value="0">
-          <span id="intensityMinValue">0</span> <!-- Displays intensity min value -->
 
-          <label for="intensityMax">Intensity Max</label>
-          <input type="range" id="intensityMax" min="0" max="255" value="255">
-          <span id="intensityMaxValue">255</span> <!-- Displays intensity max value -->
+        <div class="goal-colour-sliders">
+          <label>Goal Colour Ranges:</label>
+          
+          <div class="slider-container">
+            <label for="hueMinGoal">Hue Min</label>
+            <input type="range" id="hueMinGoal" min="0" max="179" value="0">
+            <span id="hueMinGoalValue">0</span> <!-- Displays hue min value -->
+
+            <label for="hueMaxGoal">Hue Max</label>
+            <input type="range" id="hueMaxGoal" min="0" max="179" value="179">
+            <span id="hueMaxGoalValue">179</span> <!-- Displays hue max value -->
+          </div>
+            
+          <div class="slider-container">
+            <label for="saturationMinGoal">Saturation Min</label>
+            <input type="range" id="saturationMinGoal" min="0" max="255" value="0">
+            <span id="saturationMinGoalValue">0</span> <!-- Displays saturation min value -->
+
+            <label for="saturationMaxGoal">Saturation Max</label>
+            <input type="range" id="saturationMaxGoal" min="0" max="255" value="255">
+            <span id="saturationMaxGoalValue">255</span> <!-- Displays saturation max value -->
+          </div>
+          
+          <div class="slider-container">
+            <label for="intensityMinGoal">Intensity Min</label>
+            <input type="range" id="intensityMinGoal" min="0" max="255" value="0">
+            <span id="intensityMinGoalValue">0</span> <!-- Displays intensity min value -->
+
+            <label for="intensityMaxGoal">Intensity Max</label>
+            <input type="range" id="intensityMaxGoal" min="0" max="255" value="255">
+            <span id="intensityMaxGoalValue">255</span> <!-- Displays intensity max value -->
+          </div>
         </div>
       </div>
 

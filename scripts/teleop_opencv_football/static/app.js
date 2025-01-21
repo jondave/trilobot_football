@@ -180,3 +180,41 @@ document.addEventListener('keydown', function (event) {
         return;
     }
 });
+
+// Function to fetch ultrasonic distance
+function fetchUltrasonicData() {
+    fetch('/get_ultrasonic_data')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // console.log("Distance: ", data.distance); // Replace with actual distance display logic
+            // Example: Update distance on the page
+            document.getElementById('ultrasonic_distance').innerText = `Distance: ${data.distance} cm`;
+        })
+        .catch(error => {
+            console.error('Error fetching ultrasonic data:', error);
+        });
+}
+
+// Start or stop fetching ultrasonic data
+let isUltrasonicEnabled = false;
+let fetchInterval;
+
+document.getElementById('ultrasonic').onclick = ev => {
+    ev.preventDefault();
+    isUltrasonicEnabled = !isUltrasonicEnabled;
+
+    if (isUltrasonicEnabled) {
+        console.log("Starting ultrasonic data fetch...");
+        document.getElementById('ultrasonic_distance').innerText = `Distance: Starting`;
+        fetchInterval = setInterval(fetchUltrasonicData, 1000); // Fetch data every second
+    } else {
+        console.log("Stopping ultrasonic data fetch...");
+        document.getElementById('ultrasonic_distance').innerText = `Distance: Stopped`;
+        clearInterval(fetchInterval);
+    }
+};

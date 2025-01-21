@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_from_directory, Response
+from flask import Flask, render_template, send_from_directory, Response, jsonify
 from flask_sock import Sock
 import socket 
 import cv2
@@ -12,18 +12,31 @@ class TrilobotController:
         self.app = Flask(__name__)
         self.sock = Sock(self.app)
 
-        self.speed = 0.5
+        ################# tunable variables       
+
+        ####### follow ball function
+        # Define a threshold for how far the centre of contour around the ball can be from the center before adjusting the motors
+        self.threshold = 100
+        
+        # Calculate speed adjustments based on the offset
+        self.speed_factor = 0.005  # You can adjust this factor for more sensitivity
+        self.max_speed = 1.0  # Set the max speed of the follow ball function
+        ####### follow ball function
+
+        ################# tunable variables
+
+        self.speed = 0.5 # starting speed
         self.tbot = Trilobot()
 
-        self.enable_colour_detect = False
-        self.enable_follow_ball = False
-        self.enable_draw_all_contours = False
-        self.hue_min = 0
-        self.hue_max = 179
-        self.saturation_min = 0
-        self.saturation_max = 255
-        self.intensity_min = 0
-        self.intensity_max = 255
+        self.enable_colour_detect = False # starting flag 
+        self.enable_follow_ball = False # starting flag 
+        self.enable_draw_all_contours = False # starting flag 
+        self.hue_min = 0 # starting hue min 
+        self.hue_max = 179 # starting hue  max
+        self.saturation_min = 0 # starting saturation min
+        self.saturation_max = 255 # starting saturation max
+        self.intensity_min = 0 # starting intensity min
+        self.intensity_max = 255 # starting intensity max
 
         self.picam2 = Picamera2()
         self.picam2.configure(self.picam2.create_preview_configuration(main={"format": 'BGR888', "size": (640, 480)}))
@@ -114,7 +127,11 @@ class TrilobotController:
                 else: 
                     print("send either `up` `down` `left` `right` or `stop` to move your robot!")
 
-        
+        @self.app.route('/get_ultrasonic_data', methods=['GET'])
+        def get_ultrasonic_data():
+            distance = self.tbot.read_distance(timeout=25, samples=3)
+            print("distance: " + str(distance))
+            return jsonify({'distance': round(distance, 1)})
 
         def colour_detect(self, _img):
             hsv_img = cv2.cvtColor(_img, cv2.COLOR_BGR2HSV) # convert to hsv image
@@ -142,16 +159,25 @@ class TrilobotController:
             # Find the largest contour using max() and cv2.contourArea as the key
             largest_contour = max(hsv_contours, key=cv2.contourArea)
                 
-            # Draw all the contours if enabled
+            # Draw and fill all the contours with opacity
             if self.enable_draw_all_contours:
-                # In hsv_contours we now have an array of individual closed contours (basically a polgon around the blobs in the mask). Let's iterate over all those found contours.
+                # Create an overlay to draw the contours on
+                overlay = _img.copy()
+
+                # Iterate through the contours
                 for c in hsv_contours:
-                    # This allows to compute the area (in pixels) of a contour
+                    # Calculate the area of the contour
                     a = cv2.contourArea(c)
-                    # and if the area is big enough, we draw the outline
-                    # of the contour (in blue)
+                    # If the area is big enough, fill the contour on the overlay
                     if a > 100.0:
-                        cv2.drawContours(_img, c, -1, (255, 0, 0), 10)
+                        cv2.drawContours(overlay, [c], -1, (0, 255, 0), cv2.FILLED)  # Draw filled contour on overlay
+                        cv2.drawContours(_img, [c], -1, (255, 0, 0), 2)  # Draw outline of contours
+
+                # Set the desired opacity (0.0 to 1.0)
+                opacity = 0.5
+
+                # Blend the overlay with the original image
+                _img = cv2.addWeighted(overlay, opacity, _img, 1 - opacity, 0)
 
             return _img, largest_contour
 
@@ -160,50 +186,40 @@ class TrilobotController:
             x, y, w, h = cv2.boundingRect(largest_contour)
 
             # Calculate the horizontal middle (center) of the bounding box
-            horizontal_middle = x + w // 2
+            bounding_box_center = x + w // 2
 
             # Get the center of the image
             image_center = _img.shape[1] // 2  # Width of the image
 
             # Calculate the offset between the contour's center and the image center
-            offset = horizontal_middle - image_center
-
-            # Define a threshold for how far the contour can be from the center before adjusting the motors
-            threshold = 20
-            
-            # Calculate speed adjustments based on the offset
-            speed_factor = 0.005  # You can adjust this factor for more sensitivity
-            max_speed = 0.5  # Set the max speed to 1
-
-            # Base speed value
-            speed = 0.3
+            offset = bounding_box_center - image_center
 
             # Proportional control: If the offset is larger than the threshold, adjust the robot's speed
-            if abs(offset) > threshold:
-                if offset > 0:
+            if abs(offset) > self.threshold:
+                if bounding_box_center > image_center:
                     # If the contour is to the right of the center, turn right
-                    left_speed = speed + (offset * speed_factor)
-                    right_speed = speed - (offset * speed_factor)
+                    left_speed = self.speed + (abs(offset) * self.speed_factor)
+                    right_speed = self.speed - (abs(offset) * self.speed_factor)
                 else:
                     # If the contour is to the left of the center, turn left
-                    left_speed = speed - (offset * speed_factor)
-                    right_speed = speed + (offset * speed_factor)
+                    left_speed = self.speed - (abs(offset) * self.speed_factor)
+                    right_speed = self.speed + (abs(offset) * self.speed_factor)
                 
                 # Clamp the speeds to be within the range [0, max_speed]
-                left_speed = max(0, min(max_speed, left_speed))
-                right_speed = max(0, min(max_speed, right_speed))
+                left_speed = max(0, min(self.max_speed, left_speed))
+                right_speed = max(0, min(self.max_speed, right_speed))
                 
                 # Set the motor speeds to move the robot
                 self.tbot.set_motor_speeds(round(left_speed, 1), round(right_speed, 1))
                 print("left_speed:", left_speed, "right_speed:", right_speed, end="\r")
             else:
                 # If the contour is close to the center, move forward
-                self.tbot.set_motor_speeds(speed, speed)
-                print("forward speed: ", speed)
+                self.tbot.set_motor_speeds(self.speed, self.speed)
+                print("forward speed: ", self.speed)
 
             # Optionally, draw the bounding box and the middle point
             cv2.rectangle(_img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            cv2.circle(_img, (horizontal_middle, y + h // 2), 5, (0, 0, 255), -1)
+            cv2.circle(_img, (bounding_box_center, y + h // 2), 5, (0, 0, 255), -1)
 
             return _img
 
