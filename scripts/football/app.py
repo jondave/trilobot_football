@@ -32,6 +32,7 @@ class TrilobotController:
         self.enable_colour_detect_goal = False # starting flag
         self.enable_follow_ball = False # starting flag
         self.enable_follow_goal = False # starting flag
+        self.enable_custom_code = False # starting flag
 
         # Ball detection colour ranges
         self.hue_min = 0 # starting hue min 
@@ -122,6 +123,9 @@ class TrilobotController:
                     self.enable_colour_detect_goal = not self.enable_colour_detect_goal
                     self.enable_follow_goal = not self.enable_follow_goal
                     self.enable_follow_ball = False
+
+                elif cmd[0] == "custom_code":
+                    self.enable_custom_code = not self.enable_custom_code
 
                 elif cmd[0] == "speed":
                     self.speed = float(cmd[1])
@@ -342,6 +346,10 @@ class TrilobotController:
 
             return _img
 
+        def custom_code(self):
+            ##### Add custom code in the function, when the custom code button is pressed this function will run
+            print("custom_code running")
+
         def video_gen(self):
             """Video streaming generator function."""
             while True:
@@ -357,7 +365,10 @@ class TrilobotController:
                     img = follow_ball(self, img, largest_contour)                
 
                 if self.enable_follow_goal and largest_contour_goal is not None:
-                    img = follow_goal(self, img, largest_contour_goal)
+                    img = follow_goal(self, img, largest_contour_goal)                
+
+                if self.enable_custom_code:
+                    custom_code(self)
 
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                 ret, jpeg = cv2.imencode('.jpg', img)

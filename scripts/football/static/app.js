@@ -59,7 +59,12 @@ document.getElementById('opencv_goal').onclick = ev => {
 document.getElementById('follow_goal').onclick = ev => {
     ev.preventDefault();
     sendCmd("follow_goal");
-};follow_goal
+};
+
+document.getElementById('custom_code').onclick = ev => {
+    ev.preventDefault();
+    sendCmd("custom_code");
+};
 
 // Speed slider Controls
 const speedSlider = document.getElementById('speedSlider');

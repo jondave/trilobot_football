@@ -92,9 +92,12 @@
             </svg>
           </button>
         </div>
-
-        <h1 id="hostname">{{ hostname }}</h1>
-        <h2 id="ultrasonic_distance">Distance: No Data</h2>
+          <button class="btn" id="custom_code">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path fill="#fff" d="M5.59 3.41L7 4.82L3.82 8L7 11.18L5.59 12.6L1 8zm5.82 0L16 8l-4.59 4.6L10 11.18L13.18 8L10 4.82zM22 6v12c0 1.11-.89 2-2 2H4a2 2 0 0 1-2-2v-4h2v4h16V6h-2.97V4H20c1.11 0 2 .89 2 2" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <button id="stop-mobile">
@@ -177,6 +180,10 @@
             <input type="range" id="intensityMaxGoal" min="0" max="255" value="255">
           </div>
         </div>
+
+        <h1 id="hostname">{{ hostname }}</h1>
+        <h2 id="ultrasonic_distance">Distance: No Data</h2>
+
       </div>
 
     </main>
