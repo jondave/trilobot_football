@@ -3,6 +3,7 @@ from flask_sock import Sock
 import socket 
 import cv2
 from picamera2 import Picamera2
+from libcamera import Transform
 import numpy as np
 import time
 from trilobot import Trilobot
@@ -51,8 +52,22 @@ class TrilobotController:
         self.intensity_max_goal = 255 # starting intensity max
 
         self.picam2 = Picamera2()
-        self.picam2.configure(self.picam2.create_preview_configuration(main={"format": 'BGR888', "size": (640, 480)}))
+        self.picam2.configure(self.picam2.create_preview_configuration(main={"format": 'BGR888', "size": (1640, 1232)}))
+        # self.picam2.configure(self.picam2.create_preview_configuration(main={"format": 'BGR888', "size": (640, 480)}))
         self.picam2.start()
+        
+        # Camera resolutions
+        # 0x2464-SBGGR8_1X8 - Selected unicam format: 3280x2464-BA81
+        # [
+        # {'format': SRGGB10_CSI2P, 'unpacked': 'SRGGB10', 'bit_depth': 10, 'size': (640, 480), 'fps': 103.33, 'crop_limits': (1000, 752, 1280, 960), 'exposure_limits': (75, None)},
+        # {'format': SRGGB10_CSI2P, 'unpacked': 'SRGGB10', 'bit_depth': 10, 'size': (1640, 1232), 'fps': 41.85, 'crop_limits': (0, 0, 3280, 2464), 'exposure_limits': (75, 11766829, None)}, 
+        # {'format': SRGGB10_CSI2P, 'unpacked': 'SRGGB10', 'bit_depth': 10, 'size': (1920, 1080), 'fps': 47.57, 'crop_limits': (680, 692, 1920, 1080), 'exposure_limits': (75, 11766829, None)}, 
+        # {'format': SRGGB10_CSI2P, 'unpacked': 'SRGGB10', 'bit_depth': 10, 'size': (3280, 2464), 'fps': 21.19, 'crop_limits': (0, 0, 3280, 2464), 'exposure_limits': (75, 11766829, None)}, 
+        # {'format': SRGGB8, 'unpacked': 'SRGGB8', 'bit_depth': 8, 'size': (640, 480), 'fps': 103.33, 'crop_limits': (1000, 752, 1280, 960), 'exposure_limits': (75, 11766829, None)}, 
+        # {'format': SRGGB8, 'unpacked': 'SRGGB8', 'bit_depth': 8, 'size': (1640, 1232), 'fps': 41.85, 'crop_limits': (0, 0, 3280, 2464), 'exposure_limits': (75, 11766829, None)}, 
+        # {'format': SRGGB8, 'unpacked': 'SRGGB8', 'bit_depth': 8, 'size': (1920, 1080), 'fps': 47.57, 'crop_limits': (680, 692, 1920, 1080), 'exposure_limits': (75, 11766829, None)}, 
+        # {'format': SRGGB8, 'unpacked': 'SRGGB8', 'bit_depth': 8, 'size': (3280, 2464), 'fps': 21.19, 'crop_limits': (0, 0, 3280, 2464), 'exposure_limits': (75, 11766829, None)}
+        # ]
 
         @self.app.route('/')
         def index():
@@ -354,6 +369,8 @@ class TrilobotController:
             """Video streaming generator function."""
             while True:
                 img = self.picam2.capture_array()
+
+                img = cv2.resize(img, (640, 480))
 
                 if self.enable_colour_detect:
                     img, largest_contour = colour_detect(self, img)
