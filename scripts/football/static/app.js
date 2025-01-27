@@ -283,7 +283,7 @@ intensityMaxInputGoal.addEventListener('input', () => {
 updateValues();
 // Color Range Sliders Goal End
 
-// WASD Controls
+// AWSD Controls
 document.addEventListener('keydown', function (event) {
     if (event.code === 'KeyW') {
         sendCmd('up');
@@ -294,6 +294,8 @@ document.addEventListener('keydown', function (event) {
     } else if (event.code === 'KeyD') {
         sendCmd('right');
     } else if (event.code === 'KeyX') {
+        sendCmd('stop');
+    } else if (event.code === 'spaceAction') {
         sendCmd('stop');
     } else if (event.code === 'Enter') {
         return;
