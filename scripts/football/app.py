@@ -365,6 +365,10 @@ class TrilobotController:
             ##### Add custom code in the function, when the custom code button is pressed this function will run
             print("custom_code running")
 
+            ##### example code to read ultrasonic sensor
+            distance = self.tbot.read_distance(timeout=25, samples=3)
+            print("distance: " + str(distance))
+
         def video_gen(self):
             """Video streaming generator function."""
             while True:
