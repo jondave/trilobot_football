@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <link rel="manifest" href="/manifest.json" />
+    <title>Trilobot Teleop</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='main.css') }}"
+    />
+  </head>
+  <body>
+    <main>    
+
+      <img src="{{ url_for('video_feed') }}" id="camera" />
+      
+      <!-- Icons from https://icon-sets.iconify.design/mdi/ -->  
+      <div class="controls">
+        <div id="button-flex">
+          <button class="btn" id="up">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M15 20H9v-8H4.16L12 4.16L19.84 12H15z"
+              />
+            </svg>
+          </button>
+          <button class="btn" id="down">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M9 4h6v8h4.84L12 19.84L4.16 12H9z" />
+            </svg>
+          </button>
+        </div>
+        <div id="button-flex">
+          <button class="btn" id="left">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M20 9v6h-8v4.84L4.16 12L12 4.16V9z"
+              />
+            </svg>
+          </button>
+          <button class="btn" id="right">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M4 15V9h8V4.16L19.84 12L12 19.84V15z"
+              />
+            </svg>
+          </button>
+        </div>
+        <div id="button-flex">
+          <button class="btn" id="stop">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M18 18H6V6h12z" />
+            </svg>
+          </button>
+
+          <button class="btn" id="ultrasonic">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path fill="#fff" d="M16.79 23c-.42-.17-.72-.55-.79-1c-.05-.26 0-.44.4-1.16c1.5-2.7 2.27-5.75 2.23-8.84c.04-3-.69-5.93-2.13-8.56c-.21-.44-.4-.86-.56-1.31c.06-.38.25-.73.56-.94c.45-.24 1-.19 1.41.09c.28.36.52.72.72 1.14A21.4 21.4 0 0 1 20.8 9c.23 1.81.26 3.65.09 5.47c-.31 2.34-1 4.6-2.06 6.71c-.64 1.28-1 1.82-1.38 1.82zm-4.36-2.21c-.57-.16-.93-.74-.81-1.32c0-.12.31-.67.59-1.23c1.18-2.27 1.69-4.83 1.46-7.38c-.14-1.83-.67-3.61-1.54-5.22c-.63-1.26-.67-1.46-.3-2c.44-.49 1.17-.56 1.71-.14c.72 1.06 1.29 2.22 1.71 3.44c1.28 3.79 1.08 7.92-.56 11.56c-.84 1.89-1.43 2.5-2.26 2.24zm-4.5-2.23a1.31 1.31 0 0 1-.73-.86c0-.2 0-.46.45-1.26a8.99 8.99 0 0 0 0-8.68C7 6.5 7 6.24 7.53 5.76c.19-.22.47-.33.77-.29c.64 0 1 .31 1.54 1.44A10.5 10.5 0 0 1 11.12 12c.04 1.81-.4 3.61-1.27 5.2c-.54 1.05-.81 1.3-1.35 1.39c-.19.02-.39 0-.57-.09zm-4.21-2.13c-.33-.16-.59-.43-.72-.78c-.1-.35 0-.65.4-1.29c.5-.68.74-1.52.69-2.36c.07-.85-.16-1.69-.65-2.39A6 6 0 0 1 3 8.82c-.11-.63.31-1.23 1-1.35c.54-.1.92.13 1.42.89a6.62 6.62 0 0 1 0 7.27c-.51.77-1.09 1-1.69.8z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="button-flex">
+          <button class="btn" id="follow_ball">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path fill="#00ff00" d="M19.04 4.85C17.34 3.2 15.33 2.25 13 2v3.62l9 5.18c-.28-2.3-1.27-4.3-2.96-5.95M12 22c3.44 0 6.16-1.38 8.17-4.14L17.06 16l-8.99 5.2c1.25.53 2.57.8 3.93.8m1-10.59l8.15 4.66c.44-.94.73-1.93.85-2.96l-9-5.18zm-9.12 6.4c.66.91 1.38 1.65 2.17 2.19l8.99-5.1L12 13.15zM11.04 2C10 2.09 9 2.36 8 2.8v10.35l3.04-1.74zM2 12c0 1.39.3 2.77.89 4.12L6 14.28V4c-2.67 2-4 4.65-4 8"/>
+            </svg>
+          </button>
+          
+          <button class="btn" id="opencv">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path fill="#00ff00" d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2m8 3a5 5 0 0 0-5 5a5 5 0 0 0 5 5a5 5 0 0 0 5-5a5 5 0 0 0-5-5m0 2a3 3 0 0 1 3 3a3 3 0 0 1-3 3a3 3 0 0 1-3-3a3 3 0 0 1 3-3" />
+            </svg>
+          </button>
+        </div>
+        <div id="button-flex">
+          <button class="btn" id="follow_goal">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path fill="#ff0000" d="M2 2v20h20V2zm18 10h-4v4h4v4h-4v-4h-4v4H8v-4H4v-4h4V8H4V4h4v4h4V4h4v4h4zm-4-4v4h-4V8zm-4 4v4H8v-4z" />
+            </svg>
+          </button>
+          <button class="btn" id="opencv_goal">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path fill="#ff0000" d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2m8 3a5 5 0 0 0-5 5a5 5 0 0 0 5 5a5 5 0 0 0 5-5a5 5 0 0 0-5-5m0 2a3 3 0 0 1 3 3a3 3 0 0 1-3 3a3 3 0 0 1-3-3a3 3 0 0 1 3-3" />
+            </svg>
+          </button>
+        </div>
+          <button class="btn" id="custom_code">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path fill="#fff" d="M5.59 3.41L7 4.82L3.82 8L7 11.18L5.59 12.6L1 8zm5.82 0L16 8l-4.59 4.6L10 11.18L13.18 8L10 4.82zM22 6v12c0 1.11-.89 2-2 2H4a2 2 0 0 1-2-2v-4h2v4h16V6h-2.97V4H20c1.11 0 2 .89 2 2" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <button id="stop-mobile">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M3 3v18h18V3"/></svg>
+      </button>
+
+      <div id="controls">
+        <div class="speed-slider">
+          <div class="slider-container">
+            <label for="speedSlider">Speed</label>
+            <input type="range" id="speedSlider" min="0" max="1" step="0.01" value="0.5">
+            <span id="speedLabel">Speed (0-1): 0.5</span> <!-- Displays speed value -->
+          </div>
+        </div>
+
+        <div class="ball-colour-sliders">
+          <label>Ball Colour Ranges:</label>
+
+          <div class="slider-container">
+            <label for="hueMin">Hue Min: </label>
+            <span id="hueMinValue">0</span> <!-- Displays hue min value -->
+            <input type="range" id="hueMin" min="0" max="179" value="0">
+
+            <label for="hueMax">Hue Max: </label>
+            <span id="hueMaxValue">179</span> <!-- Displays hue max value -->
+            <input type="range" id="hueMax" min="0" max="179" value="179">
+          </div>
+            
+          <div class="slider-container">
+            <label for="saturationMin">Saturation Min: </label>
+            <span id="saturationMinValue">0</span> <!-- Displays saturation min value -->
+            <input type="range" id="saturationMin" min="0" max="255" value="0">
+
+            <label for="saturationMax">Saturation Max: </label>
+            <span id="saturationMaxValue">255</span> <!-- Displays saturation max value -->
+            <input type="range" id="saturationMax" min="0" max="255" value="255">
+          </div>
+          
+          <div class="slider-container">
+            <label for="intensityMin">Intensity Min: </label>
+            <span id="intensityMinValue">0</span> <!-- Displays intensity min value -->
+            <input type="range" id="intensityMin" min="0" max="255" value="0">
+
+            <label for="intensityMax">Intensity Max: </label>
+            <span id="intensityMaxValue">255</span> <!-- Displays intensity max value -->
+            <input type="range" id="intensityMax" min="0" max="255" value="255">
+          </div>
+        </div>
+
+        <div class="goal-colour-sliders">
+          <label>Goal Colour Ranges:</label>
+          
+          <div class="slider-container">
+            <label for="hueMinGoal">Hue Min: </label>
+            <span id="hueMinValueGoal">0</span> <!-- Displays hue min value -->
+            <input type="range" id="hueMinGoal" min="0" max="179" value="0">
+
+            <label for="hueMaxGoal">Hue Max: </label>
+            <span id="hueMaxValueGoal">179</span> <!-- Displays hue max value -->
+            <input type="range" id="hueMaxGoal" min="0" max="179" value="179">
+          </div>
+            
+          <div class="slider-container">
+            <label for="saturationMinGoal">Saturation Min: </label>
+            <span id="saturationMinValueGoal">0</span> <!-- Displays saturation min value -->
+            <input type="range" id="saturationMinGoal" min="0" max="255" value="0">
+
+            <label for="saturationMaxGoal">Saturation Max: </label>
+            <span id="saturationMaxValueGoal">255</span> <!-- Displays saturation max value -->
+            <input type="range" id="saturationMaxGoal" min="0" max="255" value="255">
+          </div>
+          
+          <div class="slider-container">
+            <label for="intensityMinGoal">Intensity Min: </label>
+            <span id="intensityMinValueGoal">0</span> <!-- Displays intensity min value -->
+            <input type="range" id="intensityMinGoal" min="0" max="255" value="0">
+
+            <label for="intensityMaxGoal">Intensity Max: </label>
+            <span id="intensityMaxValueGoal">255</span> <!-- Displays intensity max value -->
+            <input type="range" id="intensityMaxGoal" min="0" max="255" value="255">
+          </div>
+        </div>
+
+        <h1 id="hostname">{{ hostname }}</h1>
+        <h2 id="ultrasonic_distance">Distance: No Data</h2>
+
+      </div>
+
+    </main>
+
+    <script src="{{ url_for('static', filename='xbox.js') }}"></script>
+  </body>
+</html>

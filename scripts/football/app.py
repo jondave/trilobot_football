@@ -7,11 +7,14 @@ from libcamera import Transform
 import numpy as np
 import time
 from trilobot import Trilobot
+import atexit
 
 class TrilobotController:
     def __init__(self):
         self.app = Flask(__name__)
         self.sock = Sock(self.app)
+
+        atexit.register(self.cleanup) # Clean up when exiting
 
         ################# tunable variables       
 
@@ -74,6 +77,11 @@ class TrilobotController:
             hostname = (socket.gethostname().split(".")[0]).upper()
             return render_template('index.html', hostname=hostname)
 
+        @self.app.route('/xbox')
+        def xbox():
+            hostname = (socket.gethostname().split(".")[0]).upper()
+            return render_template('xbox.html', hostname=hostname)
+
         @self.app.route("/manifest.json")
         def manifest():
             return send_from_directory('./static', 'manifest.json')
@@ -84,108 +92,114 @@ class TrilobotController:
 
         @self.sock.route('/command')
         def command(sock):
-            while True:
-                # trilobot movement commands
-                # tbot.forward(speed)
-                # tbot.backward(speed)
-                # tbot.turn_left(speed)
-                # tbot.turn_right(speed)
+            try:
+                while True:
+                    # trilobot movement commands
+                    # tbot.forward(speed)
+                    # tbot.backward(speed)
+                    # tbot.turn_left(speed)
+                    # tbot.turn_right(speed)
 
-                # tbot.set_left_speed(speed)
-                # tbot.set_right_speed(speed)
-                # tbot.set_motor_speeds(left_speed, right_speed)
+                    # tbot.set_left_speed(speed)
+                    # tbot.set_right_speed(speed)
+                    # tbot.set_motor_speeds(left_speed, right_speed)
 
-                # tbot.curve_forward_right(speed)
-                # tbot.curve_forward_left(speed)
-                # tbot.curve_backward_right(speed)
-                # tbot.curve_backward_left(speed)
+                    # tbot.curve_forward_right(speed)
+                    # tbot.curve_forward_left(speed)
+                    # tbot.curve_backward_right(speed)
+                    # tbot.curve_backward_left(speed)
 
-                # tbot.stop() # stop quickly
-                # tbot.coast()  # Come to a halt gently
-                
-                # Split the received command by ':' to get speed
-                cmd = sock.receive().split(':')
+                    # tbot.stop() # stop quickly
+                    # tbot.coast()  # Come to a halt gently
+                    
+                    # Split the received command by ':' to get speed
+                    cmd = sock.receive().split(':')
 
-                if cmd[0] == "left":
-                    self.tbot.turn_left(self.speed)
+                    if cmd[0] == "left":
+                        self.tbot.turn_left(self.speed)
 
-                elif cmd[0] == "right":
-                    self.tbot.turn_right(self.speed)
+                    elif cmd[0] == "right":
+                        self.tbot.turn_right(self.speed)
 
-                elif cmd[0] == "up":
-                    self.tbot.forward(self.speed)
+                    elif cmd[0] == "up":
+                        self.tbot.forward(self.speed)
 
-                elif cmd[0] == "down":
-                    self.tbot.backward(self.speed)
+                    elif cmd[0] == "down":
+                        self.tbot.backward(self.speed)
 
-                elif cmd[0] == "stop":
-                    self.tbot.stop()
-                    self.enable_follow_ball = False
-                    self.enable_follow_goal = False
+                    elif cmd[0] == "stop":
+                        self.tbot.stop()
+                        self.enable_follow_ball = False
+                        self.enable_follow_goal = False
 
-                elif cmd[0] == "opencv":
-                    self.enable_colour_detect = not self.enable_colour_detect
+                    elif cmd[0] == "opencv":
+                        self.enable_colour_detect = not self.enable_colour_detect
 
-                elif cmd[0] == "follow_ball":
-                    self.enable_colour_detect = not self.enable_colour_detect
-                    self.enable_follow_ball = not self.enable_follow_ball
-                    self.enable_follow_goal = False
+                    elif cmd[0] == "follow_ball":
+                        self.enable_colour_detect = not self.enable_colour_detect
+                        self.enable_follow_ball = not self.enable_follow_ball
+                        self.enable_follow_goal = False
 
-                elif cmd[0] == "opencv_goal":
-                    self.enable_colour_detect_goal = not self.enable_colour_detect_goal
+                    elif cmd[0] == "opencv_goal":
+                        self.enable_colour_detect_goal = not self.enable_colour_detect_goal
 
-                elif cmd[0] == "follow_goal":
-                    self.enable_colour_detect_goal = not self.enable_colour_detect_goal
-                    self.enable_follow_goal = not self.enable_follow_goal
-                    self.enable_follow_ball = False
+                    elif cmd[0] == "follow_goal":
+                        self.enable_colour_detect_goal = not self.enable_colour_detect_goal
+                        self.enable_follow_goal = not self.enable_follow_goal
+                        self.enable_follow_ball = False
 
-                elif cmd[0] == "custom_code":
-                    self.enable_custom_code = not self.enable_custom_code
+                    elif cmd[0] == "custom_code":
+                        self.enable_custom_code = not self.enable_custom_code
 
-                elif cmd[0] == "speed":
-                    self.speed = float(cmd[1])
+                    elif cmd[0] == "speed":
+                        self.speed = float(cmd[1])
 
-                elif cmd[0] == "hue_min":
-                    self.hue_min = int(cmd[1])
+                    elif cmd[0] == "hue_min":
+                        self.hue_min = int(cmd[1])
 
-                elif cmd[0] == "hue_max":
-                    self.hue_max = int(cmd[1])
+                    elif cmd[0] == "hue_max":
+                        self.hue_max = int(cmd[1])
 
-                elif cmd[0] == "saturation_min":
-                    self.saturation_min = int(cmd[1])
+                    elif cmd[0] == "saturation_min":
+                        self.saturation_min = int(cmd[1])
 
-                elif cmd[0] == "saturation_max":
-                    self.saturation_max = int(cmd[1])
+                    elif cmd[0] == "saturation_max":
+                        self.saturation_max = int(cmd[1])
 
-                elif cmd[0] == "intensity_min":
-                    self.intensity_min = int(cmd[1])
+                    elif cmd[0] == "intensity_min":
+                        self.intensity_min = int(cmd[1])
 
-                elif cmd[0] == "intensity_max":
-                    self.intensity_max = int(cmd[1])
+                    elif cmd[0] == "intensity_max":
+                        self.intensity_max = int(cmd[1])
 
-                elif cmd[0] == "speed":
-                    self.speed = float(cmd[1])
+                    elif cmd[0] == "speed":
+                        self.speed = float(cmd[1])
 
-                elif cmd[0] == "hue_min_goal":
-                    self.hue_min_goal = int(cmd[1])
+                    elif cmd[0] == "hue_min_goal":
+                        self.hue_min_goal = int(cmd[1])
 
-                elif cmd[0] == "hue_max_goal":
-                    self.hue_max_goal = int(cmd[1])
+                    elif cmd[0] == "hue_max_goal":
+                        self.hue_max_goal = int(cmd[1])
 
-                elif cmd[0] == "saturation_min_goal":
-                    self.saturation_min_goal = int(cmd[1])
+                    elif cmd[0] == "saturation_min_goal":
+                        self.saturation_min_goal = int(cmd[1])
 
-                elif cmd[0] == "saturation_max_goal":
-                    self.saturation_max_goal = int(cmd[1])
+                    elif cmd[0] == "saturation_max_goal":
+                        self.saturation_max_goal = int(cmd[1])
 
-                elif cmd[0] == "intensity_min_goal":
-                    self.intensity_min_goal = int(cmd[1])
+                    elif cmd[0] == "intensity_min_goal":
+                        self.intensity_min_goal = int(cmd[1])
 
-                elif cmd[0] == "intensity_max_goal":
-                    self.intensity_max_goal = int(cmd[1])
+                    elif cmd[0] == "intensity_max_goal":
+                        self.intensity_max_goal = int(cmd[1])
 
-                else: 
-                    print("send either `up` `down` `left` `right` or `stop` to move your robot!")
+                    else: 
+                        print("send either `up` `down` `left` `right` or `stop` to move your robot!")
+
+            except Exception as e:
+                # Stop the robot if there's an error or disconnection
+                print(f"Error or disconnection: {e}")
+                self.tbot.stop()
 
         @self.app.route('/get_ultrasonic_data', methods=['GET'])
         def get_ultrasonic_data():
@@ -401,6 +415,11 @@ class TrilobotController:
         def video_feed():
             """Video streaming route. Put this in the src attribute of an img tag."""
             return Response(video_gen(self), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+    def cleanup(self):
+        """This function will be called when the program exits."""
+        print("Cleaning up before exit...")
+        self.tbot.stop()
 
 if __name__ == "__main__":
     controller = TrilobotController()
